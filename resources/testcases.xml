@@ -2,7 +2,7 @@
 <suite name="NopCommerce" >
   <test name="Check Config">
     <classes>
-      <class name="com.NopCommerce.User.FirstClass"/>
+      <class name="com.nopcommerce.user.Level_03_Page_Object"/>
     </classes>
   </test>
 </suite>
