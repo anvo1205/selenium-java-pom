@@ -1,8 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suite name="NopCommerce" >
-  <test name="Check Config">
+
+  <test name="Registration - Chrome">
     <classes>
-      <class name="com.nopcommerce.user.Level_03_Page_Object"/>
+    <parameter name="browser" value="chrome" />
+      <class name="com.nopcommerce.user.TestMyAccount"/>
     </classes>
   </test>
+  
+<!--     <test name="Registration - Firefox"> -->
+<!--     <classes> -->
+<!--     <parameter name="browser" value=firefox" /> -->
+<!--       <class name="com.nopcommerce.user.TestLogin"/> -->
+<!--     </classes> -->
+<!--   </test> -->
+  
+<!--     <test name="Registration - Chromium Edge"> -->
+<!--     <classes> -->
+<!--     <parameter name="browser" value="edge" /> -->
+<!--       <class name="com.nopcommerce.user.TestMultiBrowsers"/> -->
+<!--     </classes> -->
+<!--   </test> -->
 </suite>

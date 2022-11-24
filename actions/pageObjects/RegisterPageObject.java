@@ -1,8 +1,10 @@
 package pageObjects;
 
 import org.openqa.selenium.WebDriver;
+import org.testng.Assert;
 
 import commons.BasePage;
+import objects.Accounts;
 import pageUIs.RegisterPageUI;
 
 public class RegisterPageObject extends BasePage{
@@ -78,15 +80,26 @@ public class RegisterPageObject extends BasePage{
 		return getText(driver, RegisterPageUI.REGISTER_SUCCESS_MSG);
 	}
 
-	public void clickLogOutLink() {
+	public HomePageObject clickLogOutLink() {
 		waitForElementClikable(driver, RegisterPageUI.LOG_OUT_LINK);
 		clickElement(driver, RegisterPageUI.LOG_OUT_LINK);
+		return PageGeneratorManager.getHomepage(driver);
 		
 	}
 
 	public String getEmailAlreadyExistErrorMsg() {
 		waitForElementVisible(driver, RegisterPageUI.EMAIL_ALREADY_EXIST_ERROR_MSG);
 		return getText(driver, RegisterPageUI.EMAIL_ALREADY_EXIST_ERROR_MSG);
+	}
+	
+	public void registerAnAccount(Accounts acc) {
+		inputFirstName(acc.getFirstName());
+		inputLastName(acc.getLastName());
+		inputEmail(acc.getEmail());
+		inputPassword(acc.getPassword());
+		inputConfirmPassword(acc.getPassword());  
+		clickRegisterButton();
+		
 	}
 
 }
