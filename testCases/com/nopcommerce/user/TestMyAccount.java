@@ -10,6 +10,8 @@ import pageObjects.HomePageObject;
 import pageObjects.LoginPageObject;
 import pageObjects.PageGeneratorManager;
 import pageObjects.RegisterPageObject;
+import pageUIs.HomePageUI.Top_Menu_Xpaths;
+import pageUIs.MyAcccountPageUI.Left_Menu_Xpaths;
 import utilities.Date_Util;
 
 import org.testng.annotations.BeforeClass;
@@ -27,23 +29,23 @@ public class TestMyAccount extends BaseTest{
 	private CustomerInforPageObject customerInforPage;
 	private ChangePasswordPageObject changePasswordPage;
 	
-	@Parameters("browser")
-	  @BeforeClass
-	  public void beforeClass(String browser){
+	@Parameters({"browser", "baseUrl"})
+	@BeforeClass
+	public void beforeClass(String browserName, String baseUrl) {
 		newAcc = Accounts.NEW_ACCOUNT;
 		updatedAcc = Accounts.FULL_INFO_ACCOUNT;
-		  driver = getBrowserDriver(browser);
+		  driver = getBrowserDriver(browserName, baseUrl);
 		  
 		  homePage = PageGeneratorManager.getHomepage(driver);
 		  
 		  //Pre-condition: Register and Login Succeed
-		  registerPage = homePage.clickRegisterLink();
+		  registerPage = (RegisterPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.REGISTER_LINK);
 		  registerPage.registerAnAccount(newAcc);
 	  }
 	  
   @Test
   public void MyAcc_01_Update_Customer_Info() {
-	  customerInforPage = homePage.clickMyAccountLink();
+	  customerInforPage = (CustomerInforPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.MY_ACCOUNT_LINK);
 	  customerInforPage.selectGender(updatedAcc.getGender());
 	  customerInforPage.selectDOB(updatedAcc.getDob());
 	  customerInforPage.inputEmail(updatedAcc.getEmail());
@@ -67,13 +69,13 @@ public class TestMyAccount extends BaseTest{
   @Test
   public void MyAcc_03_Change_Password() {
 	  String newPassword = "123123";
-	  changePasswordPage = customerInforPage.navigateToChangePasswordPage();
+	  changePasswordPage = (ChangePasswordPageObject) customerInforPage.NavigateToLeftMenuPage(Left_Menu_Xpaths.CHANGE_PASSWORD);
 	  changePasswordPage.ChangePassword(updatedAcc.getPassword(),newPassword);
 	  Assert.assertEquals(changePasswordPage.getChangePasswordSuccessMessage(), "Password was changed");
 	  changePasswordPage.closeSuccessMessage();
-	  homePage.clickLogoutLink();
-	  loginPage = homePage.clickLoginLink();
-	  homePage = loginPage.login(updatedAcc.getEmail(), newPassword);
+	  homePage = (HomePageObject) changePasswordPage.clickTopMenuLink(Top_Menu_Xpaths.LOGOUT_LINK);
+	  loginPage = (LoginPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.LOGIN_LINK);
+	  homePage = (HomePageObject) loginPage.login(updatedAcc.getEmail(), newPassword);
 	  Assert.assertTrue(homePage.isMyAccountLinkDisplayed());
   }
   

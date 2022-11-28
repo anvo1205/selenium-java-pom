@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
@@ -14,7 +13,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class BaseTest {
 	private WebDriver driver;
 
-	protected WebDriver getBrowserDriver(String browserName) {
+	protected WebDriver getBrowserDriver(String browserName, String baseUrl) {
 		if (browserName.equals("chrome")) {
 			WebDriverManager.chromedriver().setup();
 			driver = WebDriverManager.chromedriver().create();
@@ -36,8 +35,8 @@ public class BaseTest {
 		}
 		else if (browserName.equals("firefox")) {
 			//Firefox 108 has not been supported yet
-			System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\browserDrivers\\geckodriver.exe");
-//			driver = WebDriverManager.firefoxdriver().create();
+//			System.setProperty("webdriver.gecko.driver", System.getProperty("user.dir") + "\\browserDrivers\\geckodriver.exe");
+			driver = WebDriverManager.firefoxdriver().create();
 			driver = new FirefoxDriver();
 		} else if (browserName.equals("edge")) {
 			WebDriverManager.edgedriver().setup();
@@ -47,7 +46,7 @@ public class BaseTest {
 		}
 
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-		driver.get("https://demo.nopcommerce.com/");
+		driver.get(baseUrl);
 
 		return driver;
 	}

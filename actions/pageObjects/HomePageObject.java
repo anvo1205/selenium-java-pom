@@ -3,44 +3,36 @@ package pageObjects;
 import org.openqa.selenium.WebDriver;
 
 import commons.BasePage;
-import pageUIs.HomePageUI;
+import pageUIs.HomePageUI.Top_Menu_Xpaths;
 
 public class HomePageObject extends BasePage{
-	private WebDriver driver;
 	
 	public  HomePageObject(WebDriver driver) {
-		this.driver = driver;
+		super(driver);
 	}
-
-	public RegisterPageObject clickRegisterLink() {
-		waitForElementClikable(driver, HomePageUI.REGISTER_LINK);
-		clickElement(driver, HomePageUI.REGISTER_LINK);
-		return PageGeneratorManager.getRegisterPage(driver);
-		
-	}
-
-	public LoginPageObject clickLoginLink() {
-		waitForElementClikable(driver, HomePageUI.LOGIN_LINK);
-		clickElement(driver, HomePageUI.LOGIN_LINK);
-		return PageGeneratorManager.getLoginPage(driver);
+	
+	public HomePageObject clickTopMenuLink(Top_Menu_Xpaths link) {
+		waitForElementClikable(link.getXpath());
+		clickElement(link.getXpath());
+		switch(link) {
+		case LOGIN_LINK:
+			return PageGeneratorManager.getLoginPage(driver);
+		case LOGOUT_LINK:
+			return PageGeneratorManager.getHomepage(driver);
+		case REGISTER_LINK:
+			return PageGeneratorManager.getRegisterPage(driver);
+		case MY_ACCOUNT_LINK:
+			return PageGeneratorManager.getCustomerInforPage(driver);
+			default:
+				throw new RuntimeException("Invalid link");
+		}
 		
 	}
 
 	public boolean isMyAccountLinkDisplayed() {
-		return isElementDisplayed(driver, HomePageUI.MY_ACCOUNT_LINK);
+		return isElementDisplayed(Top_Menu_Xpaths.MY_ACCOUNT_LINK.getXpath());
 	}
 
-	public CustomerInforPageObject clickMyAccountLink() {
-		waitForElementClikable(driver, HomePageUI.MY_ACCOUNT_LINK);
-		clickElement(driver, HomePageUI.MY_ACCOUNT_LINK);
-		return PageGeneratorManager.getCustomerInforPage(driver);
-	}
-	
-	public HomePageObject clickLogoutLink() {
-		waitForElementClikable(driver, HomePageUI.LOGOUT_LINK);
-		clickElement(driver, HomePageUI.LOGOUT_LINK);
-		return PageGeneratorManager.getHomepage(driver);
-	}
 	
 	
 

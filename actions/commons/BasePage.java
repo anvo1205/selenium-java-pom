@@ -15,12 +15,17 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class BasePage {
+	protected WebDriver driver;
 	private WebDriverWait explicitWait;
 	private Select select;
 	private JavascriptExecutor js;
 	private WebElement element;
 	private List<WebElement> elements;
 	private Actions action;
+	
+	public BasePage(WebDriver driver) {
+		this.driver = driver;
+	}
 
 	/*
 	 * ************************************************************************
@@ -36,7 +41,7 @@ public class BasePage {
 	 * @param driver
 	 * @param url
 	 */
-	public void openUrl(WebDriver driver, String url) {
+	public void openUrl(String url) {
 		driver.get(url);
 	}
 
@@ -46,7 +51,7 @@ public class BasePage {
 	 * @param driver
 	 * @return String page title
 	 */
-	public String getPageTitle(WebDriver driver) {
+	public String getPageTitle() {
 		return driver.getTitle();
 	}
 
@@ -56,7 +61,7 @@ public class BasePage {
 	 * @param driver
 	 * @return String
 	 */
-	public String getCurrentUrl(WebDriver driver) {
+	public String getCurrentUrl() {
 		return driver.getCurrentUrl();
 	}
 
@@ -65,7 +70,7 @@ public class BasePage {
 	 * 
 	 * @param driver
 	 */
-	public void back(WebDriver driver) {
+	public void back() {
 		driver.navigate().back();
 	}
 
@@ -74,7 +79,7 @@ public class BasePage {
 	 * 
 	 * @param driver
 	 */
-	public void refresh(WebDriver driver) {
+	public void refresh() {
 		driver.navigate().refresh();
 	}
 
@@ -83,7 +88,7 @@ public class BasePage {
 	 * 
 	 * @param driver
 	 */
-	public void forward(WebDriver driver) {
+	public void forward() {
 		driver.navigate().forward();
 	}
 
@@ -92,7 +97,7 @@ public class BasePage {
 	 * 
 	 * @param driver
 	 */
-	public void acceptAlert(WebDriver driver) {
+	public void acceptAlert() {
 		driver.switchTo().alert().accept();
 	}
 
@@ -101,7 +106,7 @@ public class BasePage {
 	 * 
 	 * @param driver
 	 */
-	public void cancelAlert(WebDriver driver) {
+	public void cancelAlert() {
 		driver.switchTo().alert().dismiss();
 	}
 
@@ -111,7 +116,7 @@ public class BasePage {
 	 * @param driver
 	 * @param value
 	 */
-	public void sendKeysToAlert(WebDriver driver, String value) {
+	public void sendKeysToAlert(String value) {
 		driver.switchTo().alert().sendKeys(value);
 	}
 
@@ -121,7 +126,7 @@ public class BasePage {
 	 * @param driver
 	 * @return String
 	 */
-	public String getTextInAlert(WebDriver driver) {
+	public String getTextInAlert() {
 		return driver.switchTo().alert().getText();
 	}
 
@@ -130,7 +135,7 @@ public class BasePage {
 	 * 
 	 * @param driver
 	 */
-	public void waitForAlertPresence(WebDriver driver) {
+	public void waitForAlertPresence() {
 		explicitWait = new WebDriverWait(driver, GlobalConstants.MAX_TIMEOUT);
 		explicitWait.until(ExpectedConditions.alertIsPresent());
 	}
@@ -141,7 +146,7 @@ public class BasePage {
 	 * @param driver
 	 * @param parentID
 	 */
-	public void switchToWindowByID(WebDriver driver, String parentID) {
+	public void switchToWindowByID(String parentID) {
 		Set<String> allWindows = driver.getWindowHandles();
 		for (String currentWindow : allWindows) {
 			if (!currentWindow.equals(parentID)) {
@@ -156,7 +161,7 @@ public class BasePage {
 	 * @param driver
 	 * @param title
 	 */
-	public void switchToWindowByTitle(WebDriver driver, String title) {
+	public void switchToWindowByTitle(String title) {
 		Set<String> allWindows = driver.getWindowHandles();
 		for (String window : allWindows) {
 			driver.switchTo().window(window);
@@ -173,7 +178,7 @@ public class BasePage {
 	 * @param driver
 	 * @param parentID The ID of parent window you want to keep open
 	 */
-	public boolean areAllWindowsClosedButParent(WebDriver driver, String parentID) {
+	public boolean areAllWindowsClosedButParent(String parentID) {
 		Set<String> allWindows = driver.getWindowHandles();
 		for (String currentWindow : allWindows) {
 			if (!currentWindow.equals(parentID)) {
@@ -208,6 +213,44 @@ public class BasePage {
 	public By byXpath(String xpath) {
 		return By.xpath(xpath);
 	}
+	
+	/**
+	 * Capture element by xpath and return By object.
+	 * xpath is dynamic depending on the dynamic value
+	 * 
+	 * @param xpath
+	 * @return By
+	 */
+	public By byDynamicXpath(String xpath, String... dynamicValue) {
+		return By.xpath(String.format(xpath, (Object[])dynamicValue));
+	}
+	
+	/**
+	 * Depends on the prefix of the element
+	 * which is the locatorType, this method will return respective By locator
+	 * This method is only used when there are many locator types than xpath
+	 * The other functions need to be refactored as well if this method is being used
+	 * 
+	 * @param locatorType
+	 * @return By
+	 */
+	private By getByLocator(String locatorType) {
+		By by = null;
+		if (locatorType.startsWith("id=")) {
+			by = By.id(locatorType.substring(3));
+		} else if (locatorType.startsWith("class=")) {
+			by = By.className(locatorType.substring(6));
+		}  else if (locatorType.startsWith("name=")) {
+			by = By.name(locatorType.substring(5));
+		}  else if (locatorType.startsWith("css=")) {
+			by = By.cssSelector(locatorType.substring(4));
+		}  else if (locatorType.startsWith("xpath=")) {
+			by = By.xpath(locatorType.substring(6));
+		}  else {
+			throw new RuntimeException("Locator is not supported!");
+		} 
+		return by;
+	}
 
 	/**
 	 * Capture element by xpath and return WebElement object
@@ -216,14 +259,28 @@ public class BasePage {
 	 * @param xpath
 	 * @return WebElement
 	 */
-	public WebElement findElementByXpath(WebDriver driver, String xpath) {
+	public WebElement findElementByXpath(String xpath) {
 		try {
 			return driver.findElement(byXpath(xpath));
 		} catch (NoSuchElementException e) {
 			System.out.println("Element is not found!");
 			return null;
 		}
-
+	}
+	/**
+	 * Capture element by xpath and return WebElement object
+	 * 
+	 * @param driver
+	 * @param xpath
+	 * @return WebElement
+	 */
+	public WebElement findDynamicElementByXpath(String xpath, String... dynamicValue) {
+		try {
+			return driver.findElement(byDynamicXpath((xpath), dynamicValue));
+		} catch (NoSuchElementException e) {
+			System.out.println("Element is not found!");
+			return null;
+		}
 	}
 
 	/**
@@ -233,19 +290,30 @@ public class BasePage {
 	 * @param xpath
 	 * @return List<WebElement> A list of web elements having the same xpath
 	 */
-	public List<WebElement> findElementsByXpath(WebDriver driver, String xpath) {
+	public List<WebElement> findElementsByXpath(String xpath) {
 		return driver.findElements(byXpath(xpath));
 	}
-
+	
 	/**
 	 * Click on a web element after waiting for it visible
 	 * 
 	 * @param driver
 	 * @param xpath
 	 */
-	public void clickElement(WebDriver driver, String xpath) {
-		waitForElementVisible(driver, xpath);
-		findElementByXpath(driver, xpath).click();
+	public void clickElement(String xpath) {
+		waitForDynamicElementVisible(xpath);
+		findElementByXpath(xpath).click();
+	}
+
+	/**
+	 * Click on a dynamic web element after waiting for it visible
+	 * 
+	 * @param driver
+	 * @param xpath
+	 */
+	public void clickDynamicElement(String xpath, String... dynamicValue ) {
+		waitForDynamicElementVisible(xpath, dynamicValue);
+		findDynamicElementByXpath(xpath, dynamicValue).click();
 	}
 
 	/**
@@ -255,9 +323,23 @@ public class BasePage {
 	 * @param xpath
 	 * @param value
 	 */
-	public void sendKeysToElement(WebDriver driver, String xpath, String value) {
-		waitForElementVisible(driver, xpath);
-		element = findElementByXpath(driver, xpath);
+	public void sendKeysToElement(String xpath, String value) {
+		waitForElementVisible(xpath);
+		element = findElementByXpath(xpath);
+		element.clear();
+		element.sendKeys(value);
+	}
+	
+	/**
+	 * Input value to a dynamic textbox after clearing the old value
+	 * 
+	 * @param driver
+	 * @param xpath
+	 * @param value
+	 */
+	public void sendKeysToDynamicElement(String xpath, String value, String... dynamicValue) {
+		waitForDynamicElementVisible(xpath, dynamicValue);
+		element = findDynamicElementByXpath(xpath, dynamicValue);
 		element.clear();
 		element.sendKeys(value);
 	}
@@ -269,8 +351,19 @@ public class BasePage {
 	 * @param xpath
 	 * @return String
 	 */
-	public String getText(WebDriver driver, String xpath) {
-		return findElementByXpath(driver, xpath).getText().trim();
+	public String getText(String xpath) {
+		return findElementByXpath(xpath).getText().trim();
+	}
+	
+	/**
+	 * Get text from a dynamic web element
+	 * 
+	 * @param driver
+	 * @param xpath
+	 * @return String
+	 */
+	public String getTextOfDynamicElement(String xpath, String... dynamicValue) {
+		return findDynamicElementByXpath(xpath, dynamicValue).getText().trim();
 	}
 
 	/**
@@ -280,8 +373,8 @@ public class BasePage {
 	 * @param xpath
 	 * @return String
 	 */
-	public String getAttribute(WebDriver driver, String xpath, String attribute) {
-		return findElementByXpath(driver, xpath).getAttribute(attribute);
+	public String getAttribute(String xpath, String attribute) {
+		return findElementByXpath(xpath).getAttribute(attribute);
 	}
 
 	/**
@@ -291,8 +384,8 @@ public class BasePage {
 	 * @param xpath
 	 * @param value
 	 */
-	public void selectValueInDropDown(WebDriver driver, String xpath, String value) {
-		select = new Select(findElementByXpath(driver, xpath));
+	public void selectValueInDropDown(String xpath, String value) {
+		select = new Select(findElementByXpath(xpath));
 		select.selectByVisibleText(value);
 	}
 
@@ -303,8 +396,8 @@ public class BasePage {
 	 * @param xpath  xPath of the item in drop-down
 	 * @return String Text of 1st selected item in dropdown
 	 */
-	public String getSelectItemInDropDown(WebDriver driver, String xpath) {
-		select = new Select(findElementByXpath(driver, xpath));
+	public String getSelectItemInDropDown(String xpath) {
+		select = new Select(findElementByXpath(xpath));
 		return select.getFirstSelectedOption().getText();
 	}
 
@@ -317,14 +410,14 @@ public class BasePage {
 	 * @param parentsXpath  xPath of the drop-down
 	 * @param childrenXpath xPath of the items in the drop-down
 	 */
-	public void selectItemFromCustomDropdown(WebDriver driver, String parentsXpath, String childrenXpath,
+	public void selectItemFromCustomDropdown(String parentsXpath, String childrenXpath,
 			String selectedItem) {
-		element = findElementByXpath(driver, parentsXpath);
+		element = findElementByXpath(parentsXpath);
 		js = (JavascriptExecutor) driver;
 		explicitWait = new WebDriverWait(driver, 15);
 		js.executeScript("arguments[0].click();", element);
 		waitInSeconds(1);
-		elements = findElementsByXpath(driver, childrenXpath);
+		elements = findElementsByXpath(childrenXpath);
 		explicitWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath(childrenXpath)));
 		for (WebElement childElement : elements) {
 			if (childElement.getText().equals(selectedItem)) {
@@ -349,8 +442,8 @@ public class BasePage {
 	 * @param xpath
 	 * @return int Number of elements
 	 */
-	public int countElements(WebDriver driver, String xpath) {
-		return findElementsByXpath(driver, xpath).size();
+	public int countElements(String xpath) {
+		return findElementsByXpath(xpath).size();
 	}
 
 	/**
@@ -360,8 +453,8 @@ public class BasePage {
 	 * @param xpath
 	 * @param status true or false
 	 */
-	public void setCheckbox(WebDriver driver, String xpath, boolean status) {
-		element = findElementByXpath(driver, xpath);
+	public void setCheckbox(String xpath, boolean status) {
+		element = findElementByXpath(xpath);
 		if (element.isSelected() != status)// status is expected status, if current != expected -> click to change
 											// status
 		{
@@ -376,9 +469,9 @@ public class BasePage {
 	 * @param xpath
 	 * @return Boolean return true if element is displayed in DOM & UI
 	 */
-	public boolean isElementDisplayed(WebDriver driver, String xpath) {
+	public boolean isElementDisplayed(String xpath) {
 		try {
-			return findElementByXpath(driver, xpath).isDisplayed();
+			return findElementByXpath(xpath).isDisplayed();
 		} catch (NoSuchElementException e) {
 			System.out.println("Element is not displayed!");
 			return false;
@@ -392,8 +485,8 @@ public class BasePage {
 	 * @param xpath
 	 * @return Boolean return true if element is displayed in DOM & UI
 	 */
-	public boolean isElementEnabled(WebDriver driver, String xpath) {
-		return findElementByXpath(driver, xpath).isEnabled();
+	public boolean isElementEnabled(String xpath) {
+		return findElementByXpath(xpath).isEnabled();
 	}
 
 	/**
@@ -403,8 +496,8 @@ public class BasePage {
 	 * @param xpath
 	 * @return Boolean return true if element is displayed & enabled in DOM & UI
 	 */
-	public boolean isElementSelected(WebDriver driver, String xpath) {
-		return findElementByXpath(driver, xpath).isSelected();
+	public boolean isElementSelected(String xpath) {
+		return findElementByXpath(xpath).isSelected();
 	}
 
 	/**
@@ -413,8 +506,8 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void switchToFrameOrIframe(WebDriver driver, String xpath) {
-		driver.switchTo().frame(findElementByXpath(driver, xpath));
+	public void switchToFrameOrIframe(String xpath) {
+		driver.switchTo().frame(findElementByXpath(xpath));
 	}
 
 	/**
@@ -432,9 +525,9 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void hoverMouseToElement(WebDriver driver, String xpath) {
+	public void hoverMouseToElement(String xpath) {
 		action = new Actions(driver);
-		action.moveToElement(findElementByXpath(driver, xpath)).perform();
+		action.moveToElement(findElementByXpath(xpath)).perform();
 	}
 
 	/**
@@ -443,9 +536,9 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void doubleClickOnElement(WebDriver driver, String xpath) {
+	public void doubleClickOnElement(String xpath) {
 		action = new Actions(driver);
-		action.doubleClick(findElementByXpath(driver, xpath)).perform();
+		action.doubleClick(findElementByXpath(xpath)).perform();
 	}
 
 	/**
@@ -454,9 +547,9 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void rightClickOnElement(WebDriver driver, String xpath) {
+	public void rightClickOnElement(String xpath) {
 		action = new Actions(driver);
-		action.contextClick(findElementByXpath(driver, xpath)).perform();
+		action.contextClick(findElementByXpath(xpath)).perform();
 	}
 
 	/**
@@ -466,9 +559,9 @@ public class BasePage {
 	 * @param xpath
 	 * @param value
 	 */
-	public void sendKeyboardToElement(WebDriver driver, String xpath, String value) {
+	public void sendKeyboardToElement(String xpath, String value) {
 		action = new Actions(driver);
-		action.sendKeys(findElementByXpath(driver, xpath), value).perform();
+		action.sendKeys(findElementByXpath(xpath), value).perform();
 	}
 
 	/**
@@ -478,7 +571,7 @@ public class BasePage {
 	 * @param javaScript
 	 * @return Object depends on the returned value from javascript
 	 */
-	public Object executeJavaScript(WebDriver driver, String javaScript) {
+	public Object executeJavaScript(String javaScript) {
 		js = (JavascriptExecutor) driver;
 		return js.executeScript(javaScript);
 	}
@@ -489,9 +582,9 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void clickElementByJS(WebDriver driver, String xpath) {
+	public void clickElementByJS(String xpath) {
 		js = (JavascriptExecutor) driver;
-		js.executeScript("arguments[0].click();", findElementByXpath(driver, xpath));
+		js.executeScript("arguments[0].click();", findElementByXpath(xpath));
 	}
 
 	/**
@@ -500,9 +593,9 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void ScrollToElement(WebDriver driver, String xpath) {
+	public void ScrollToElement(String xpath) {
 		js = (JavascriptExecutor) driver;
-		js.executeScript("arguments[0].scrollIntoView(true);", findElementByXpath(driver, xpath));
+		js.executeScript("arguments[0].scrollIntoView(true);", findElementByXpath(xpath));
 	}
 
 	/**
@@ -512,9 +605,9 @@ public class BasePage {
 	 * @param xpath
 	 * @param value
 	 */
-	public void sendKeysByJS(WebDriver driver, String xpath, String value) {
+	public void sendKeysByJS(String xpath, String value) {
 		js = (JavascriptExecutor) driver;
-		js.executeScript("arguments[0].setAttribute('value', '" + value + "')", findElementByXpath(driver, xpath));
+		js.executeScript("arguments[0].setAttribute('value', '" + value + "')", findElementByXpath(xpath));
 	}
 
 	/**
@@ -524,9 +617,9 @@ public class BasePage {
 	 * @param xpath
 	 * @param attributeName
 	 */
-	public void removeAttributeByJS(WebDriver driver, String xpath, String attributeName) {
+	public void removeAttributeByJS(String xpath, String attributeName) {
 		js = (JavascriptExecutor) driver;
-		js.executeScript("arguments[0].removeAttribute('" + attributeName + "');", findElementByXpath(driver, xpath));
+		js.executeScript("arguments[0].removeAttribute('" + attributeName + "');", findElementByXpath(xpath));
 	}
 
 	/**
@@ -537,7 +630,7 @@ public class BasePage {
 	 * @param expectedText
 	 * @return boolean return true if text matches with expectedText
 	 */
-	public boolean verifyTextInInnerText(WebDriver driver, String xpath, String expectedText) {
+	public boolean verifyTextInInnerText(String xpath, String expectedText) {
 		js = (JavascriptExecutor) driver;
 		String actualText = (String) js
 				.executeScript("return document.documentElement.innerText.match('" + expectedText + "')[0]");
@@ -560,10 +653,26 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void waitForElementVisible(WebDriver driver, String xpath) {
+	public void waitForElementVisible(String xpath) {
 		explicitWait = new WebDriverWait(driver, GlobalConstants.MAX_TIMEOUT);
 		try {
 			explicitWait.until(ExpectedConditions.visibilityOfElementLocated(byXpath(xpath)));
+		} catch (ElementNotVisibleException e) {
+			System.out.println("Element is not visible!");
+		}
+
+	}
+	
+	/**
+	 * Wait until element visible in UI, if not throw exception
+	 * 
+	 * @param driver
+	 * @param xpath
+	 */
+	public void waitForDynamicElementVisible(String xpath, String... dynamicValue) {
+		explicitWait = new WebDriverWait(driver, GlobalConstants.MAX_TIMEOUT);
+		try {
+			explicitWait.until(ExpectedConditions.visibilityOfElementLocated(byDynamicXpath(xpath, dynamicValue)));
 		} catch (ElementNotVisibleException e) {
 			System.out.println("Element is not visible!");
 		}
@@ -576,7 +685,7 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void waitForElementInvisible(WebDriver driver, String xpath) {
+	public void waitForElementInvisible(String xpath) {
 		explicitWait = new WebDriverWait(driver, GlobalConstants.MAX_TIMEOUT);
 		explicitWait.until(ExpectedConditions.invisibilityOfElementLocated(byXpath(xpath)));
 	}
@@ -587,7 +696,7 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void waitForElementClikable(WebDriver driver, String xpath) {
+	public void waitForElementClikable(String xpath) {
 		explicitWait = new WebDriverWait(driver, GlobalConstants.MAX_TIMEOUT);
 		explicitWait.until(ExpectedConditions.elementToBeClickable(byXpath(xpath)));
 	}
@@ -598,7 +707,7 @@ public class BasePage {
 	 * @param driver
 	 * @param xpath
 	 */
-	public void waitForElementPresence(WebDriver driver, String xpath) {
+	public void waitForElementPresence(String xpath) {
 		explicitWait = new WebDriverWait(driver, GlobalConstants.MAX_TIMEOUT);
 		explicitWait.until(ExpectedConditions.presenceOfElementLocated(byXpath(xpath)));
 	}
@@ -637,9 +746,9 @@ public class BasePage {
 	 * @param xpath
 	 * @param restParams parameters used to identify the element
 	 */
-	public void clickElement(WebDriver driver, String xpath, String... restParams) {
-		waitForElementVisible(driver, castToObject(xpath, restParams));
-		findElementByXpath(driver, castToObject(xpath, restParams)).click();
+	public void clickElement(String xpath, String... restParams) {
+		waitForElementVisible(castToObject(xpath, restParams));
+		findElementByXpath(castToObject(xpath, restParams)).click();
 	}
 
 	/**
@@ -651,9 +760,9 @@ public class BasePage {
 	 * @param value
 	 * @param restParams parameters used to identify the element
 	 */
-	public void sendKeysToElement(WebDriver driver, String xpath, String value, String... restParams) {
-		waitForElementVisible(driver, castToObject(xpath, restParams));
-		element = findElementByXpath(driver, castToObject(xpath, restParams));
+	public void sendKeysToElement(String xpath, String value, String... restParams) {
+		waitForElementVisible(castToObject(xpath, restParams));
+		element = findElementByXpath(castToObject(xpath, restParams));
 		element.clear();
 		element.sendKeys(value);
 	}
@@ -667,9 +776,9 @@ public class BasePage {
 	 * @param restParams parameters used to identify the element
 	 * @return Boolean return true if element is displayed in DOM & UI
 	 */
-	public boolean isElementDisplayed(WebDriver driver, String xpath, String... restParams) {
+	public boolean isElementDisplayed(String xpath, String... restParams) {
 		try {
-			return findElementByXpath(driver, castToObject(xpath, restParams)).isDisplayed();
+			return findElementByXpath(castToObject(xpath, restParams)).isDisplayed();
 		} catch (NoSuchElementException e) {
 			System.out.println("Element is not displayed!");
 			return false;
@@ -683,7 +792,7 @@ public class BasePage {
 	 * @param xpath
 	 * @param restParams parameters used to identify the element
 	 */
-	public void waitForElementVisible(WebDriver driver, String xpath, String... restParams) {
+	public void waitForElementVisible(String xpath, String... restParams) {
 		explicitWait = new WebDriverWait(driver, GlobalConstants.MAX_TIMEOUT);
 		try {
 			explicitWait.until(ExpectedConditions.visibilityOfElementLocated(byXpath(castToObject(xpath, restParams))));

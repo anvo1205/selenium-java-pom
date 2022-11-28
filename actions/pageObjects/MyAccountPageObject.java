@@ -2,32 +2,25 @@ package pageObjects;
 
 import org.openqa.selenium.WebDriver;
 
-import commons.BasePage;
-import pageUIs.MyAcccountPageUI;
+import pageUIs.MyAcccountPageUI.Left_Menu_Xpaths;
 
-public class MyAccountPageObject extends BasePage{
-	WebDriver driver;
-	
+public class MyAccountPageObject extends HomePageObject {
 	public MyAccountPageObject(WebDriver driver) {
-		this.driver = driver;
-	}
-	
-	public CustomerInforPageObject navigateToCustomerInforPage() {
-		waitForElementClikable(driver, MyAcccountPageUI.CUSTOMER_INFOR_LINK_MENU);
-		clickElement(driver, MyAcccountPageUI.CUSTOMER_INFOR_LINK_MENU);
-		return PageGeneratorManager.getCustomerInforPage(driver);
-	}
-	
-	public AddressPageObject navigateToAddressPage() {
-		waitForElementClikable(driver, MyAcccountPageUI.ADDRESS_LINK_MENU);
-		clickElement(driver, MyAcccountPageUI.ADDRESS_LINK_MENU);
-		return PageGeneratorManager.getAddressPage(driver);
-	}
-	
-	public ChangePasswordPageObject navigateToChangePasswordPage() {
-		waitForElementClikable(driver, MyAcccountPageUI.CHANGE_PASSWORD_LINK_MENU);
-		clickElement(driver, MyAcccountPageUI.CHANGE_PASSWORD_LINK_MENU);
-		return PageGeneratorManager.getChangePasswordPage(driver);
+		super(driver);
 	}
 
+	public MyAccountPageObject NavigateToLeftMenuPage(Left_Menu_Xpaths pageName) {
+		waitForElementClikable(pageName.getPageNameXpath());
+		clickElement(pageName.getPageNameXpath());
+		switch (pageName) {
+		case CUSTOMER_INFO:
+			return PageGeneratorManager.getCustomerInforPage(driver);
+		case ADDRESSES:
+			return PageGeneratorManager.getAddressPage(driver);
+		case CHANGE_PASSWORD:
+			return PageGeneratorManager.getChangePasswordPage(driver);
+		default:
+			throw new RuntimeException("INvalid page name!");
+		}
+	}
 }

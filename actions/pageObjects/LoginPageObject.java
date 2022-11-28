@@ -2,50 +2,47 @@ package pageObjects;
 
 import org.openqa.selenium.WebDriver;
 
-import commons.BasePage;
 import pageUIs.LoginPageUI;
 
-public class LoginPageObject extends BasePage{
-	private WebDriver driver;
+public class LoginPageObject extends HomePageObject{
 	
 	public LoginPageObject(WebDriver driver) {
-		this.driver = driver;
+		super(driver);
 	}
 
 	public HomePageObject clickLoginButton() {
-		waitForElementClikable(driver, LoginPageUI.LOGIN_BUTTON);
-		clickElement(driver, LoginPageUI.LOGIN_BUTTON);
+		waitForElementClikable(LoginPageUI.LOGIN_BUTTON);
+		clickElement(LoginPageUI.LOGIN_BUTTON);
 		return PageGeneratorManager.getHomepage(driver);
 		
 	}
 
 	public String getEmailErrorMsg() {
-		waitForElementVisible(driver, LoginPageUI.EMAIL_ERROR_MSG);
-		return getText(driver, LoginPageUI.EMAIL_ERROR_MSG);
+		waitForElementVisible(LoginPageUI.EMAIL_ERROR_MSG);
+		return getText(LoginPageUI.EMAIL_ERROR_MSG);
 	}
 
 	public void inputEmail(String email) {
-		waitForElementVisible(driver, LoginPageUI.EMAIL_TEXTBOX);
-		sendKeysToElement(driver, LoginPageUI.EMAIL_TEXTBOX, email);
+		waitForElementVisible(LoginPageUI.EMAIL_TEXTBOX);
+		sendKeysToElement(LoginPageUI.EMAIL_TEXTBOX, email);
 		
 	}
 
 	public String getUnsuccessfulLoginErrorMsg() {
-		waitForElementVisible(driver, LoginPageUI.UNSUCCESSFUL_LOGIN_ERROR_MSG);
-		return getText(driver, LoginPageUI.UNSUCCESSFUL_LOGIN_ERROR_MSG);
+		waitForElementVisible(LoginPageUI.UNSUCCESSFUL_LOGIN_ERROR_MSG);
+		return getText(LoginPageUI.UNSUCCESSFUL_LOGIN_ERROR_MSG);
 	}
 
 	public void inputPassword(String password) {
-		waitForElementVisible(driver, LoginPageUI.PASSWORD_TEXTBOX);
-		sendKeysToElement(driver, LoginPageUI.PASSWORD_TEXTBOX, password);
+		waitForElementVisible(LoginPageUI.PASSWORD_TEXTBOX);
+		sendKeysToElement(LoginPageUI.PASSWORD_TEXTBOX, password);
 		
 	}
 	
 	public HomePageObject login(String email, String password) {
 		inputEmail(email);
 		inputPassword(password);
-		clickLoginButton();
-		return PageGeneratorManager.getHomepage(driver);
+		return clickLoginButton();
 	}
 
 

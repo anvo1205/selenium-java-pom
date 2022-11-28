@@ -7,6 +7,7 @@ import objects.Accounts;
 import pageObjects.HomePageObject;
 import pageObjects.PageGeneratorManager;
 import pageObjects.RegisterPageObject;
+import pageUIs.HomePageUI.Top_Menu_Xpaths;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
@@ -23,18 +24,18 @@ public class TestRegistration extends BaseTest {
 	private HomePageObject homePage;
 	private RegisterPageObject registerPage;
 
-	@Parameters("browser")
+	@Parameters({"browser", "baseUrl"})
 	@BeforeClass
-	public void beforeClass(String browserName) {
+	public void beforeClass(String browserName, String baseUrl) {
 		acc = Accounts.NEW_ACCOUNT;
-		driver = getBrowserDriver(browserName);
+		driver = getBrowserDriver(browserName, baseUrl);
 		homePage = PageGeneratorManager.getHomepage(driver);
 
 	}
 
 	@Test
 	public void Register_01_Empty_Data() {
-		registerPage = homePage.clickRegisterLink();
+		registerPage = (RegisterPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.REGISTER_LINK);
 		registerPage.clickRegisterButton();
 		Assert.assertEquals(registerPage.getFirstNameErrorMsg(), "First name is required.");
 		Assert.assertEquals(registerPage.getLastNameErrorMsg(), "Last name is required.");
@@ -45,7 +46,7 @@ public class TestRegistration extends BaseTest {
 
 	@Test
 	public void Register_02_Invalid_Email() {
-		registerPage = homePage.clickRegisterLink();
+		registerPage = (RegisterPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.REGISTER_LINK);
 		acc.setEmail("123@456#%*");
 		registerPage.registerAnAccount(acc);
 		Assert.assertEquals(registerPage.getEmailErrorMsg(), "Wrong email");
@@ -53,23 +54,23 @@ public class TestRegistration extends BaseTest {
 
 	@Test
 	public void Register_03_Success() {
-		registerPage = homePage.clickRegisterLink();
+		registerPage = (RegisterPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.REGISTER_LINK);
 		acc.setEmail(Accounts.generateRandomEmail());
 		registerPage.registerAnAccount(acc);
 		Assert.assertEquals(registerPage.getRegisterSuccessMsg(), "Your registration completed");
-		homePage = registerPage.clickLogOutLink();
+		homePage = (HomePageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.LOGOUT_LINK);;
 	}
 
 	@Test
 	public void Register_04_Email_Exist() {
-		registerPage = homePage.clickRegisterLink();
+		registerPage = (RegisterPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.REGISTER_LINK);
 		registerPage.registerAnAccount(acc);
 		Assert.assertEquals(registerPage.getEmailAlreadyExistErrorMsg(), "The specified email already exists");
 	}
 
 	@Test
 	public void Register_05_Password_Less_Then_6_Characters() {
-		registerPage = homePage.clickRegisterLink();
+		registerPage = (RegisterPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.REGISTER_LINK);
 		acc.setPassword("12345");
 		registerPage.registerAnAccount(acc);
 		Assert.assertEquals(registerPage.getPasswordErrorMsg(),
@@ -78,7 +79,7 @@ public class TestRegistration extends BaseTest {
 
 	@Test
 	public void Register_06_Invalid_Confirm_Password() {
-		registerPage = homePage.clickRegisterLink();		
+		registerPage = (RegisterPageObject) homePage.clickTopMenuLink(Top_Menu_Xpaths.REGISTER_LINK);
 		acc.setPassword("123456");
 		acc.setConfirmPassword("654123");
 		registerPage.registerAnAccount(acc);

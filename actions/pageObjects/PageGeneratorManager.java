@@ -18,13 +18,29 @@ public class PageGeneratorManager {
 	public static CustomerInforPageObject getCustomerInforPage(WebDriver driver) {
 		return new CustomerInforPageObject(driver);
 	}
-
+	
 	public static AddressPageObject getAddressPage(WebDriver driver) {
 		return new AddressPageObject(driver);
 	}
 	
 	public static ChangePasswordPageObject getChangePasswordPage(WebDriver driver) {
 		return new ChangePasswordPageObject(driver);
+	}
+
+	public static AdminHomePageObject getAdminHomePage(WebDriver driver) {
+		return new AdminHomePageObject(driver);
+	}
+
+	public static AdminDashboardPageObject getAdminDashboardPage(WebDriver driver) {
+		return new AdminDashboardPageObject(driver);
+	}
+
+	public static AdminCommonPageObject getAdminCommonPage(WebDriver driver) {
+		return new AdminCommonPageObject(driver);
+	}
+	
+	public static AdminProductsPageObject getAdminProductsPage(WebDriver driver) {
+		return new AdminProductsPageObject(driver);
 	}
 
 }

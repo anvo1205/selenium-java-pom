@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="NopCommerce" parallel = "tests">
+<parameter name="baseUrl" value="https://admin-demo.nopcommerce.com/" />
+
+  <test name="Admin - Chrome">
+    <classes>
+    <parameter name="browser" value="chrome" />
+      <class name="com.nopcommerce.user.TestAdmin"/>
+    </classes>
+  </test>
+  
+</suite>

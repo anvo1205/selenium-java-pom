@@ -4,7 +4,8 @@ import utilities.General_Util;
 
 public enum Accounts {
 	NEW_ACCOUNT("Automation", "FC", generateRandomEmail(), "123456", "123456"),
-	FULL_INFO_ACCOUNT("Male", "Automation", "FC", "1999-01-01", "automationfc.vn@gmail.com", "123456", "123456", "Automation FC");
+	ADMIN("admin@yourstore.com", "admin"),
+	FULL_INFO_ACCOUNT("Male", "Automation", "FC", "1999-01-01", generateRandomEmail(), "123456", "123456", "Automation FC");
 	
 	private String gender;
 	private String firstName;
@@ -25,7 +26,7 @@ public enum Accounts {
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
-		this.setConfirmPassword(confirmPassword);
+		this.confirmPassword = confirmPassword;
 	}
 	
 	Accounts(String gender, String firstName, String lastName, String dob, String email, String password, String confirmPassword, String companyName){
